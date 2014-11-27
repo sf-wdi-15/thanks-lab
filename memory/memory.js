@@ -9,8 +9,11 @@ Working:
   -When clicked, the div background image changes to the card selected
   -When "Change Deck" is clicked, it changes the background of the cards
   -When "Change Grid" is clicked, it cycles through the pre-defined grids
+  -Added more pictures to both the front and back folders
+  -Has logic to track whether or not 2 cards match
 
-Started:
+Bug:
+  -Images only show when the pair is found.
   
 
 Plan To:
@@ -25,22 +28,43 @@ Plan To:
   -Add code to track how many found
 
 ******************************************************************************/
+
+// Need to find a way to getLength(image/frontAndBack_directory)
+var numberOfFrontImages = 20;
+var numberOfBackImages = 6; 
+
 window.onload = function()
 {
-  var element = document.getElementById('changeGrid');
-  element.onclick = changeGrid;
+  var temp = document.getElementById('changeGridButton');
+  temp.onclick = changeGrid;
 
-  element = document.getElementById('changeDeck');
-  element.onclick = changeDeck;
+  
+  temp = document.getElementById('changeDeckButton');
+  temp.onclick = changeDeck;
+
+  
+  temp = numberOfFrontImages; // # of files in card_front directory
+  while (temp--)
+  {
+    deckFrontImages.push("url('./images/card_front/front_"+ temp + ".png')");
+  }
+  
+  
+  temp = numberOfBackImages; // # of files in the card_back directory
+  while (temp--)
+  {
+    deckBackImages.push("url('./images/card_back/back_"+ temp + ".png')");
+  }
 
   generateGrid();
+
 }
 
 
-function Card(arrIndex,picIndex, div)
+function Card(arrIndex,cardIndex, div)
 {
-  this.id = arrIndex;
-  this.imgIndex = picIndex;
+  this.index = arrIndex;
+  this.imgIndex = cardIndex;
   this.isFound = false;
   this.div = div;
 }
@@ -49,28 +73,13 @@ var currentDeckBackground = 0;
 var currentGridSize = 0;
 var gridSizes = 
         [
-          [4,4],
           [4,6],
-          [6,6],
-          [6,8]
+          [6,6]
         ];
-
-
-var deckBackImages = 
-        [
-          "url('./images/card_back/back_0.png')",
-          "url('./images/card_front/front_0.png')"
-        ];
-
+var deckFrontImages = [];
+var deckBackImages = [];
 var cardList = [];
-var deckFrontImages = 
-        [
-          "url('./images/card_front/front_0.png')"
-        ];
-
-
-
-
+var card1ImageIndex = [{},{}];
 /******************************************************************************
   handleInput 
     
@@ -78,6 +87,48 @@ var deckFrontImages =
 var handleInput = function()
 {
   this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
+
+  if (!cardList[this.id].isFound)
+  {
+    if (isNaN(card1ImageIndex[0]))
+    {
+      card1ImageIndex[0] = cardList[this.id].imgIndex;
+      card1ImageIndex[1] = this.id;
+    }
+
+    else
+    {
+      if (card1ImageIndex[0] === cardList[this.id].imgIndex)
+      {
+        cardList[card1ImageIndex[1]].isFound = true;
+        cardList[this.id].isFound = true;
+      }
+
+      card1ImageIndex[0] = {};
+    }
+  }
+  updateGrid(); 
+};
+
+/******************************************************************************
+  updateGrid
+    1. iterates through the cardList
+    2. updates div background image according to whether it isFound
+******************************************************************************/
+
+var updateGrid = function()
+{
+  for (var i = 0, j = cardList.length; i < j; i +=1)
+  {
+    if (!cardList[i].isFound)
+    {
+      document.getElementById(cardList[i].index).style.backgroundImage = deckBackImages[currentDeckBackground];
+    }
+    else
+    {
+      document.getElementById(cardList[i].index).style.backgroundImage = deckFrontImages[cardList[i].imgIndex];
+    }
+  }
 };
 
 
@@ -101,6 +152,8 @@ var generateGrid = function()
   var numOfCardsNeeded = ( (gridSizes[currentGridSize][0] * 
                             gridSizes[currentGridSize][1]) / 2 );
   
+  var cardIndex = 0;
+
   var newDiv = document.createElement("gameGrid");
   newDiv.id = "grid";
   newDiv.className = "flex-center";
@@ -113,8 +166,8 @@ var generateGrid = function()
     newDiv.className = "row";
     document.getElementById('grid').appendChild(newDiv);
 
-    for (var row = 0, cardIndex = 0; row < gridSizes[currentGridSize][1]; 
-                                                row += 2, cardIndex += 0)
+    for (var row = 0; row < gridSizes[currentGridSize][1]; 
+                                      row += 2, cardIndex += 1)
     { 
       for (var i = 0; i < 2; i +=1)
       {
@@ -158,13 +211,7 @@ var changeDeck = function()
     currentDeckBackground = 0;
   }
 
-  for (var i = 0;i < cardList.length; i +=1)
-  {
-    if (!cardList[i].isFound)
-    {
-      cardList[i].div.style.backgroundImage = deckBackImages[currentDeckBackground];
-    }
-  }
+  updateGrid();
 };
 
 

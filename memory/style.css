@@ -11,7 +11,7 @@ body p {
 gameGrid {
   margin: 0 auto;
   position: relative;
-  top: 50px;
+  top: 150px;
 }
 
 .flex-center {
@@ -26,6 +26,7 @@ gameGrid {
   max-height: 50px;
   background-size: 100% 100%;
   border: 3px solid black;
+  margin: 3px;
 
 }
 
