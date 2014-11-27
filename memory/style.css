@@ -1,0 +1,76 @@
+body {
+  background:white;
+  text-align: center;
+  font-weight: bold;    
+}
+
+body p {
+   font-size: 30px;
+}
+
+gameGrid {
+  margin: 0 auto;
+  position: relative;
+  top: 50px;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+
+.tile {
+  min-width: 50px;
+  min-height: 50px;
+  max-width: 50px;
+  max-height: 50px;
+  background-size: 100% 100%;
+  border: 3px solid black;
+  background-image: url('./images/card_back/back_0.png');
+
+}
+
+.currentPlayer{
+  text-align: center;
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 50px;
+  height: 100px;
+
+}
+
+.resetButton{
+  margin: 0 auto;
+  margin-top:20px;
+  background-color: grey;
+  border: 5px solid black;
+  border-radius: 20px;
+  width: 300px;
+}
+
+.avatar {
+  min-width: 100px;
+  min-height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  background-size: 100% 100%;
+}
+.playerOne {
+  background-image: url("http://png-3.findicons.com/files/icons/175/halloween_avatar/300/mike.png");
+}
+
+.playerTwo{
+  background-image: url("http://png-1.findicons.com/files/icons/175/halloween_avatar/300/alien.png");
+}
+
+.arrow {
+  background-image: url("https://cdn2.iconfinder.com/data/icons/snipicons/5000/circle-arrow-right-512.png");
+}
+.arrowLeft{
+  transform:  scaleX(-1);
+}
+
+.arrowRight{
+  transform:  scaleX(1);
+}
+
