@@ -11,10 +11,9 @@ Working:
   -When "Change Grid" is clicked, it cycles through the pre-defined grids
   -Added more pictures to both the front and back folders
   -Has logic to track whether or not 2 cards match
-
-Bug:
-  -Images only show when the pair is found.
-  
+  -Set up timer to keep the cards revealed for a set interval if there is no match
+  -Player can change the interval that cards stay revealed (1-5 seconds)
+  -Fixed bug where the images would only show if a pair was found
 
 Plan To:
   -Set up logic to check for matching conditions based on the card index
@@ -26,8 +25,13 @@ Plan To:
   -Add code to keep track of attempts
   -Add code to keep track of start and finish time
   -Add code to track how many found
+  -Change back background color to black
+  -Turn "grid" into an object that will generate a grid if you pass in a few values
+  -Change all game variables into an object
 
 ******************************************************************************/
+
+
 
 // Need to find a way to getLength(image/frontAndBack_directory)
 var numberOfFrontImages = 20;
@@ -35,6 +39,9 @@ var numberOfBackImages = 6;
 
 window.onload = function()
 {
+  // Sandbox area to try out random code 
+
+
   var temp = document.getElementById('changeGridButton');
   temp.onclick = changeGrid;
 
@@ -42,6 +49,8 @@ window.onload = function()
   temp = document.getElementById('changeDeckButton');
   temp.onclick = changeDeck;
 
+  temp = document.getElementById('changeLevel');
+  temp.onclick = changeLevel;
   
   temp = numberOfFrontImages; // # of files in card_front directory
   while (temp--)
@@ -61,16 +70,13 @@ window.onload = function()
 }
 
 
-function Card(arrIndex,cardIndex, div)
+function Card(arrIndex,cardIndex)
 {
   this.index = arrIndex;
   this.imgIndex = cardIndex;
   this.isFound = false;
-  this.div = div;
 }
 
-var currentDeckBackground = 0;
-var currentGridSize = 0;
 var gridSizes = 
         [
           [4,6],
@@ -80,34 +86,65 @@ var deckFrontImages = [];
 var deckBackImages = [];
 var cardList = [];
 var card1ImageIndex = [{},{}];
+
+
+var currentDeckBackground = 0;
+var currentGridSize = 0;
+var currentCardImage = {};
+var currentCardIndex = {};
+var currentLevel = 1000;
 /******************************************************************************
   handleInput 
     
+
 ******************************************************************************/
+
+
+/* Player Experience
+
+1. Click one card
+2. It shows the front
+3. Click the 2nd card
+4. It shows the front
+5. Check if these 2 cards are the same
+  5a. If they are the same
+      a1. leave the background image as is
+      a2. mark both isFound = true;
+  5b. If they are different
+      b1. change the background to the deck
+      
+*/
+var timeoutID;
+var canClick = true;
 var handleInput = function()
 {
-  this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
-
-  if (!cardList[this.id].isFound)
+  if (canClick)
   {
-    if (isNaN(card1ImageIndex[0]))
+    this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
+
+    if (isNaN(currentCardImage))
     {
-      card1ImageIndex[0] = cardList[this.id].imgIndex;
-      card1ImageIndex[1] = this.id;
+      currentCardImage = cardList[this.id].imgIndex;
+      currentCardIndex = this.id;
     }
 
     else
     {
-      if (card1ImageIndex[0] === cardList[this.id].imgIndex)
+      if (currentCardImage === cardList[this.id].imgIndex)
       {
-        cardList[card1ImageIndex[1]].isFound = true;
+        cardList[currentCardIndex].isFound = true;
         cardList[this.id].isFound = true;
       }
 
-      card1ImageIndex[0] = {};
+      else
+      {
+        canClick = false;
+        timeoutID = window.setTimeout(updateGrid, currentLevel);
+      }
+
+      currentCardImage= {};
     }
   }
-  updateGrid(); 
 };
 
 /******************************************************************************
@@ -118,17 +155,22 @@ var handleInput = function()
 
 var updateGrid = function()
 {
+  
   for (var i = 0, j = cardList.length; i < j; i +=1)
   {
-    if (!cardList[i].isFound)
+    var c = document.getElementById(cardList[i].index);
+
+    if (cardList[i].isFound)
     {
-      document.getElementById(cardList[i].index).style.backgroundImage = deckBackImages[currentDeckBackground];
+      c.style.backgroundImage = deckFrontImages[cardList[i].imgIndex]; 
     }
     else
     {
-      document.getElementById(cardList[i].index).style.backgroundImage = deckFrontImages[cardList[i].imgIndex];
+      c.style.backgroundImage = deckBackImages[currentDeckBackground];
     }
   }
+
+  timeoutID = window.setTimeout(function() { canClick = true;}, 50)
 };
 
 
@@ -141,6 +183,8 @@ var updateGrid = function()
     4. pushes new Card to the cardList
     5. appends new div into the HTML page
 ******************************************************************************/
+
+
 var generateGrid = function()
 {
   // Reset game stats
@@ -181,17 +225,36 @@ var generateGrid = function()
         //newDiv.width = tile dimension
         //newDiv.height = newDiv.width;
 
-        var tempCard = new Card(newDiv.id, cardIndex, newDiv);
+        var tempCard = new Card(newDiv.id, cardIndex);
         cardList.push(tempCard);
 
-        document.getElementById("row_"+col).appendChild(cardList[newDiv.id].div);
+        document.getElementById("row_"+col).appendChild(newDiv);
 
       }
     }
-  }  
+  } 
+
+
 };
 
+/******************************************************************************
+  changeLevel
+    1. increments currentLevel by 1000
+    -currentLevel is used in handleInput() as the time interval (1000 = 1 sec)
+    2. resets to 1 second if currentLevel exceeds 5000 ms (5 seconds)
+******************************************************************************/
+var changeLevel = function()
+{
+  // add another second to the clock
+  currentLevel += 1000;
 
+  // if current level is set to 5 seconds, reset 
+  if (currentLevel > 5000)
+  {
+    // reset to 1 second 
+    currentLevel = 1000;
+  }
+};
 
 
 
@@ -213,9 +276,6 @@ var changeDeck = function()
 
   updateGrid();
 };
-
-
-
 
 /******************************************************************************
   changeGrid
