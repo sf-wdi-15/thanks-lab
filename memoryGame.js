@@ -62,7 +62,7 @@ six.onclick = function(event) {
 	flip(six, valuesArray[5]);
 };
 seven.onclick = function(event) {
-	flip(seven, valuesArray[7]);
+	flip(seven, valuesArray[6]);
 };
 eight.onclick = function(event) {
 	flip(eight, valuesArray[7]);
@@ -104,7 +104,7 @@ function flip (square, value) {
 			clickedArray.push(square);
 			//Check for match
 			if(lastClicked[0] == lastClicked[1]){
-				alert("You've made a match");
+				//alert("You've made a match");
 				numFlipped += 2;
 				lastClicked = [];
 				clickedArray = [];
