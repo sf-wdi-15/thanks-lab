@@ -8,8 +8,8 @@ h1 {
 
 }
 .container {
-	width: 400px;
-	height: 400px;
+	width: 600px;
+	height: 600px;
 	margin: 2.5% auto 5% auto;
 	background: rgb(255, 255, 204);
 	border: .05em solid;
@@ -17,8 +17,8 @@ h1 {
 }
 
 .square {
-	width: 190px;
-	height: 190px;
+	width: 140px;
+	height: 140px;
 	margin: 5px;
 	background: rgb(204, 229, 255);
 	text-align: center;
