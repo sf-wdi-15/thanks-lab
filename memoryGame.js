@@ -128,29 +128,7 @@ function flip (square, value) {
 	}
 };
 
-
-
-
-
-
-
-// Check to see if match is made
-
-
-
-//Check for win
-/*var checkForWin = function (arr, arr2) {
-	if (arr === arr2) {
-		alert("Game Over!");
-		return true;
-	}
-}
-*/
-
-// Delay isMatchMade function
-//setTimeout(flipBackOver, 2000);
-
- reset.onclick = function (event) {
+reset.onclick = function (event) {
     location.reload();
 }
 
