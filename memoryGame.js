@@ -15,236 +15,128 @@ var thirteen = document.getElementById('div_13');
 var fourteen = document.getElementById('div_14');
 var fifteen = document.getElementById('div_15');
 var sixteen = document.getElementById('div_16');
+var clickedArray = [];
 var lastClicked = [];
+var valuesArray = [];
+var numFlipped = 0;
 
 //Function that makes the array of winning numbers
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex ;
-
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
-
     // And swap it with the current element.
     temporaryValue = array[currentIndex];
     array[currentIndex] = array[randomIndex];
     array[randomIndex] = temporaryValue;
   }
-
   return array;
 }
 
-// Sets values array to determine value behind each square
+// Sets values array to determine winning squares
 valuesArray = shuffle(originalArray);
 console.log(valuesArray);
 
 
-// Assign values to each square array with [value, position]
-var squareZero = [valuesArray[0], 0];
-var squareOne = [valuesArray[1], 1];
-var squareTwo = [valuesArray[2], 2];
-var squareThree = [valuesArray[3], 3];
-var squareFour = [valuesArray[4], 4];
-var squareFive = [valuesArray[5], 5];
-var squareSix = [valuesArray[6], 6];
-var squareSeven = [valuesArray[7], 7];
-var squareEight = [valuesArray[8], 8];
-var squareNine = [valuesArray[9], 9];
-var squareTen = [valuesArray[10], 10];
-var squareEleven = [valuesArray[11], 11];
-var squareTwelve = [valuesArray[12], 12];
-var squareThirteen = [valuesArray[13], 13];
-var squareFourteen = [valuesArray[14], 14];
-var squareFifteen = [valuesArray[15], 15];
-var squareSixteen = [valuesArray[16], 16];
-
-
-
-console.log(squareZero);
-console.log(squareOne);
-console.log(squareTwo);
-console.log(squareThree);
-console.log(squareFour);
-console.log(squareFive);
-console.log(squareSix);
-console.log(squareSeven);
-console.log(squareEight);
-console.log(squareNine);
-console.log(squareTen);
-console.log(squareEleven);
-console.log(squareTwelve);
-console.log(squareThirteen);
-console.log(squareFourteen);
-console.log(squareFifteen);
-
-
-// Play
 one.onclick = function(event) {
-	one.innerHTML = valuesArray[0];
-	lastClicked.push(squareZero);
-	isMatchMade();
+	flip(one, valuesArray[0]);
 	console.log(lastClicked);
 };
 two.onclick = function(event) {
-	two.innerHTML = valuesArray[1];
-	lastClicked.push(squareOne);
-	isMatchMade();
+	flip(two, valuesArray[1]);
 	console.log(lastClicked);
 };
 three.onclick = function(event) {
-	three.innerHTML = valuesArray[2];
-	lastClicked.push(squareTwo);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(three, valuesArray[2]);
 };
 four.onclick = function(event) {
-	four.innerHTML = valuesArray[3];
-	lastClicked.push(squareThree);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(four, valuesArray[3]);
 };
 five.onclick = function(event) {
-	five.innerHTML = valuesArray[4];
-	lastClicked.push(squareFour);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(five, valuesArray[4]);
 };
 six.onclick = function(event) {
-	six.innerHTML = valuesArray[5];
-	lastClicked.push(squareFive);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(six, valuesArray[5]);
 };
 seven.onclick = function(event) {
-	seven.innerHTML = valuesArray[6];
-	lastClicked.push(squareSix);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(seven, valuesArray[7]);
 };
 eight.onclick = function(event) {
-	eight.innerHTML = valuesArray[7];
-	lastClicked.push(squareSeven);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(eight, valuesArray[7]);
 };
 nine.onclick = function(event) {
-	nine.innerHTML = valuesArray[8];
-	lastClicked.push(squareEight);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(nine, valuesArray[8]);
 };
 ten.onclick = function(event) {
-	ten.innerHTML = valuesArray[9];
-	lastClicked.push(squareNine);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(ten, valuesArray[9]);
 };
 eleven.onclick = function(event) {
-	eleven.innerHTML = valuesArray[10];
-	lastClicked.push(squareTen);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(eleven, valuesArray[10]);
 };
 twelve.onclick = function(event) {
-	twelve.innerHTML = valuesArray[11];
-	lastClicked.push(squareEleven);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(twelve, valuesArray[11]);
 };
 thirteen.onclick = function(event) {
-	thirteen.innerHTML = valuesArray[12];
-	lastClicked.push(squareTwelve);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(thirteen, valuesArray[12]);
 };
 fourteen.onclick = function(event) {
-	fourteen.innerHTML = valuesArray[13];
-	lastClicked.push(squareThirteen);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(fourteen, valuesArray[13]);
 };
 fifteen.onclick = function(event) {
-	fifteen.innerHTML = valuesArray[14];
-	lastClicked.push(squareFourteen);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(fifteen, valuesArray[14]);
 };
 sixteen.onclick = function(event) {
-	sixteen.innerHTML = valuesArray[15];
-	lastClicked.push(squareFifteen);
-	isMatchMade();
-	console.log(lastClicked);
+	flip(sixteen, valuesArray[15]);
 };
+
+// Card flip function
+function flip (square, value) {
+	if(lastClicked.length < 2) {
+		square.innerHTML = value;
+		if (lastClicked.length === 0) {
+			lastClicked.push(value);
+			clickedArray.push(square);
+		} else if(lastClicked.length == 1){
+			lastClicked.push(value);
+			clickedArray.push(square);
+			//Check for match
+			if(lastClicked[0] == lastClicked[1]){
+				alert("You've made a match");
+				numFlipped += 2;
+				lastClicked = [];
+				clickedArray = [];
+				//Check for end of game
+				if(numFlipped == originalArray.length){
+					alert("Game Over! Congratulations! The game will automatically restart.");
+					location.reload();
+				}
+			} else {
+				function flipBack() {
+					var firstSquare = document.getElementById(clickedArray[0].id);
+					var secondSquare = document.getElementById(clickedArray[1].id);
+					firstSquare.innerHTML = "";
+				    secondSquare.innerHTML = "";
+				    lastClicked = [];
+            	    clickedArray = [];
+				}
+				setTimeout(flipBack, 1000);
+			}
+		}
+	}
+};
+
+
+
+
+
+
 
 // Check to see if match is made
-var isMatchMade = function() {
-	if (lastClicked.length === 1) {
-		alert("Click another");
-		return;
-	} else if ((lastClicked[0][0]) === (lastClicked[1][0])) {
-		alert("leave this pair");
-		lastClicked = [];
-		return;
-	} else if ((lastClicked[0][1]) != (lastClicked[1][1]))  {
-	
-		if ((lastClicked[0][1] === 0) || (lastClicked[1][1] === 0)) {
-			one.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 1) || (lastClicked[1][1] === 1)) {
-			two.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 2) || (lastClicked[1][1] === 2)) {
-			three.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 3) || (lastClicked[1][1] === 3)) {
-			four.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 4) || (lastClicked[1][1] === 4)) {
-			five.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 5) || (lastClicked[1][1] === 5)) {
-			six.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 6) || (lastClicked[1][1] === 6)) {
-			seven.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 7) || (lastClicked[1][1] === 7)) {
-			eight.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 8) || (lastClicked[1][1] === 8)) {
-			nine.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 9) || (lastClicked[1][1] === 9)) {
-			ten.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 10) || (lastClicked[1][1] === 10)) {
-			eleven.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 11) || (lastClicked[1][1] === 11)) {
-			twelve.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 12) || (lastClicked[1][1] === 12)) {
-			thirteen.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 13) || (lastClicked[1][1] === 13)) {
-			fourteen.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 14) || (lastClicked[1][1] === 14)) {
-			fifteen.innerHTML = "";
-		}
-		if ((lastClicked[0][1] === 15) || (lastClicked[1][1] === 15)) {
-			sixteen.innerHTML = "";
-		}
-		console.log(lastClicked);
-		lastClicked = []; 
-		console.log(lastClicked);
 
-}
 
-};
 
 //Check for win
 /*var checkForWin = function (arr, arr2) {
