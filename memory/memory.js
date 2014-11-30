@@ -42,33 +42,72 @@ window.onload = function()
   // Sandbox area to try out random code 
   var temp = document.getElementById('changeGridButton');
   temp.onclick = changeGrid;
+  temp.onmouseenter = updateStatus;
 
   
   temp = document.getElementById('changeDeckButton');
   temp.onclick = changeDeck;
+  temp.onmouseenter = updateStatus;
 
-  temp = document.getElementById('changeLevel');
-  temp.onclick = changeLevel;
-  
+  temp = document.getElementById('changeSpeed');
+  temp.onclick = changeSpeed;
+  temp.onmouseenter = updateStatus;
+  temp.innerHTML = currentLevel / 1000 + "s";
+
+  temp = document.getElementById('changePlayerNumber');
+  temp.onclick = changePlayerNumber;
+  temp.onmouseenter = updateStatus;
+
+
+
   temp = numberOfFrontImages; // # of files in card_front directory
+
   while (temp--)
   {
     deckFrontImages.push("url('./images/card_front/front_"+ temp + ".png')");
   }
   
   temp = numberOfBackImages; // # of files in the card_back directory
+  
   while (temp--)
   {
     deckBackImages.push("url('./images/card_back/back_"+ temp + ".png')");
   }
 
+  document.getElementById('changeDeckButton').style.backgroundImage = deckBackImages[currentDeckBackground];
+  
   timerDisplay = document.getElementById('timerDisplay');
   player1Display = document.getElementById('player1Display');
   player2Display = document.getElementById('player2Display');
 
+  messageBar = document.getElementById('messageBar');
+  
   generateGrid();
 
 }
+
+var updateStatus = function()
+{
+  switch(this.id)
+  {
+    case "changeSpeed":
+      messageBar.innerHTML = "Change the card flipping speed.";
+    break;
+
+    case "changeDeckButton":
+      messageBar.innerHTML = "Change deck backgrounds.";
+    break;
+
+    case "changeGridButton":
+      messageBar.innerHTML = "Change the grid dimensions.";
+    break;
+
+    case "changePlayerNumber":
+      messageBar.innerHTML = "Change number of players.";
+    break;
+  }
+
+};
 
 function Card(arrIndex,cardIndex, notFound)
 {
@@ -83,6 +122,7 @@ function Player(found, attempts)
   this.attemptsCount = attempts;
 }
 
+var messageBar;
 
 var gridSizes = 
         [
@@ -118,6 +158,8 @@ var startTime = 0;
 var player1 = new Player(0,0);
 var player2 = new Player(0,0);
 
+var playerNumber = 1;
+
 
 
 /******************************************************************************
@@ -137,6 +179,7 @@ var player2 = new Player(0,0);
 var updateTimer = function()
 {
 
+// NEED TO FIX TIMER BUG
   secondCount = Math.floor( (new Date() - startTime) / 1000);
 
   if (secondCount > 60)
@@ -227,11 +270,12 @@ var handleInput = function()
           {
             canClick = false;
             var timeoutID = window.setTimeout(updateGrid, currentLevel);
+
+            isPlayer1 = false;
           }
 
           currentCardImage= {};
           player1.attemptsCount+=1 ;
-          isPlayer1 = false;
         }
       }
     }
@@ -272,11 +316,12 @@ var handleInput = function()
           {
             canClick = false;
             var timeoutID = window.setTimeout(updateGrid, currentLevel);
+            isPlayer1 = true;
+
           }
 
           currentCardImage= {};
           player2.attemptsCount+=1 ;
-          isPlayer1 = true;
         }
       }
     }
@@ -348,7 +393,7 @@ var generateGrid = function()
   
   var cardIndex = 0;
 
-  var newDiv = document.createElement("gameGrid");
+  var newDiv = document.createElement("div");
   newDiv.id = "grid";
   newDiv.className = "grid";
   document.getElementById('game').appendChild(newDiv);
@@ -387,12 +432,12 @@ var generateGrid = function()
 };
 
 /******************************************************************************
-  changeLevel
+  changeSpeed
     1. increments currentLevel by 1000
     -currentLevel is used in handleInput() as the time interval (1000 = 1 sec)
     2. resets to 1 second if currentLevel exceeds 5000 ms (5 seconds)
 ******************************************************************************/
-var changeLevel = function()
+var changeSpeed = function()
 {
   // add another second to the clock
   currentLevel += 1000;
@@ -403,6 +448,8 @@ var changeLevel = function()
     // reset to 1 second 
     currentLevel = 1000;
   }
+
+  document.getElementById('changeSpeed').innerHTML = currentLevel / 1000 + "s";
 };
 
 
@@ -423,6 +470,8 @@ var changeDeck = function()
     currentDeckBackground = 0;
   }
 
+  document.getElementById('changeDeckButton').style.backgroundImage = deckBackImages[currentDeckBackground];
+
   updateGrid();
 };
 
@@ -439,6 +488,26 @@ var changeGrid = function()
   if (currentGridSize >= gridSizes.length)
   {
     currentGridSize = 0;
+  }
+
+  generateGrid();
+};
+
+/******************************************************************************
+  changePlayerNumber
+******************************************************************************/
+var changePlayerNumber = function()
+{
+  if (playerNumber === 1)
+  {
+    playerNumber = 2;
+    document.getElementById('changePlayerNumber').style.backgroundImage = "url('./images/settings/player2.png')";
+
+  }
+  else
+  {
+    playerNumber = 1;
+    document.getElementById('changePlayerNumber').style.backgroundImage = "url('./images/settings/player1.png')";
   }
 
   generateGrid();
