@@ -1,0 +1,55 @@
+body{
+	width: 100%;
+  	background-image:url("back02.jpg");
+
+}
+h1 {
+	font-family:Bookman Old Style;
+	font-size: 50px;
+	color:PeachPuff;
+	margin-top: 90px;
+	
+
+}
+
+table {
+  height: 550px;
+  width: 550px;
+  border-spacing: 10px 10px;
+  
+
+}
+
+h1{
+	text-align:center;
+}
+
+#container{
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+}
+
+
+.button{
+
+	height:110px;
+	width:110px;
+	background-color: PaleGoldenRod;
+	/*margin-left:auto;
+	margin-right: auto;	*/
+
+		
+}
+
+#submit{
+	font-family:Bookman Old Style;
+}
+
+td{
+
+    text-align:center;
+    vertical-align: middle;
+}
+
+
