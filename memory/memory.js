@@ -14,6 +14,8 @@ Working:
   -Set up timer to keep the cards revealed for a set interval if there is no match
   -Player can change the interval that cards stay revealed (1-5 seconds)
   -Fixed bug where the images would only show if a pair was found
+  -Timer that displays seconds, minutes, hours
+  -Player object that will keep track of found and attempts
 
 Plan To:
   -Set up logic to check for matching conditions based on the card index
@@ -61,8 +63,8 @@ window.onload = function()
   }
 
   timerDisplay = document.getElementById('timerDisplay');
-  cardFoundDisplay = document.getElementById('cardFoundDisplay');
-  attemptsDisplay = document.getElementById('attemptsDisplay');
+  player1Display = document.getElementById('player1Display');
+  player2Display = document.getElementById('player2Display');
 
   generateGrid();
 
@@ -74,6 +76,13 @@ function Card(arrIndex,cardIndex, notFound)
   this.imgIndex = cardIndex;
   this.notFound = notFound;
 }
+
+function Player(found, attempts)
+{
+  this.cardFoundCount = found;
+  this.attemptsCount = attempts;
+}
+
 
 var gridSizes = 
         [
@@ -105,6 +114,12 @@ var minuteCount = 0;
 var hourCount = 0;
 var intervalID;
 var startTime = 0;
+
+var player1 = new Player(0,0);
+var player2 = new Player(0,0);
+
+
+
 /******************************************************************************
   handleInput 
     
@@ -171,49 +186,102 @@ var updateTimer = function()
                       secondCount;
 };
 
+
+var isPlayer1 = true;
+
 var handleInput = function()
 {
-  if (intervalID === undefined)
-  {
-    intervalID = window.setInterval(updateTimer,1000);
-    intervalId = "";
-    startTime = new Date();
-  }
 
-  if (canClick)
+  if (isPlayer1)
   {
-    if (cardList[this.id].notFound)
+    if (intervalID === undefined)
     {
-      this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
+      intervalID = window.setInterval(updateTimer,1000);
+      intervalId = "";
+      startTime = new Date();
+    }
 
-      if (isNaN(currentCardImage))
+    if (canClick)
+    {
+      if (cardList[this.id].notFound)
       {
-        currentCardImage = cardList[this.id].imgIndex;
-        currentCardIndex = this.id;
-      }
+        this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
 
-      else
-      {
-        if (currentCardImage === cardList[this.id].imgIndex)
+        if (isNaN(currentCardImage))
         {
-          cardList[currentCardIndex].notFound = false;
-          cardList[this.id].notFound = false;
-          cardFoundCount += 1;
-
+          currentCardImage = cardList[this.id].imgIndex;
+          currentCardIndex = this.id;
         }
 
         else
         {
-          canClick = false;
-          var timeoutID = window.setTimeout(updateGrid, currentLevel);
+          if (currentCardImage === cardList[this.id].imgIndex)
+          {
+            cardList[currentCardIndex].notFound = false;
+            cardList[this.id].notFound = false;
+            player1.cardFoundCount += 1;
+
+          }
+
+          else
+          {
+            canClick = false;
+            var timeoutID = window.setTimeout(updateGrid, currentLevel);
+          }
+
+          currentCardImage= {};
+          player1.attemptsCount+=1 ;
+          isPlayer1 = false;
         }
-
-        currentCardImage= {};
-        attemptsCount+=1 ;
       }
-
     }
   }
+
+  else
+  {
+    if (intervalID === undefined)
+    {
+      intervalID = window.setInterval(updateTimer,1000);
+      intervalId = "";
+      startTime = new Date();
+    }
+
+    if (canClick)
+    {
+      if (cardList[this.id].notFound)
+      {
+        this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
+
+        if (isNaN(currentCardImage))
+        {
+          currentCardImage = cardList[this.id].imgIndex;
+          currentCardIndex = this.id;
+        }
+
+        else
+        {
+          if (currentCardImage === cardList[this.id].imgIndex)
+          {
+            cardList[currentCardIndex].notFound = false;
+            cardList[this.id].notFound = false;
+            player2.cardFoundCount += 1;
+
+          }
+
+          else
+          {
+            canClick = false;
+            var timeoutID = window.setTimeout(updateGrid, currentLevel);
+          }
+
+          currentCardImage= {};
+          player2.attemptsCount+=1 ;
+          isPlayer1 = true;
+        }
+      }
+    }
+  }
+
 
   // If all cards are found
   if (cardFoundCount === numOfCardsNeeded )
@@ -221,9 +289,11 @@ var handleInput = function()
 
   }
 
-  cardFoundDisplay.innerHTML = cardFoundCount;  
-  attemptsDisplay.innerHTML = attemptsCount;
+  player1Display.innerHTML = player1.cardFoundCount + " : " + player1.attemptsCount;
+  player2Display.innerHTML = player2.cardFoundCount + " : " + player2.attemptsCount;
 };
+
+
 
 /******************************************************************************
   updateGrid
@@ -301,7 +371,6 @@ var generateGrid = function()
         newDiv.style.backgroundImage = deckBackImages[currentDeckBackground];
         newDiv.onclick = handleInput;
         newDiv.id = cardList.length;
-        newDiv.innerHTML = newDiv.id;
         //newDiv.width = tile dimension
         //newDiv.height = newDiv.width;
 
