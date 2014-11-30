@@ -8,17 +8,45 @@
 
 <body>
 
-  <div class="title" style="height:60px;">
-    <p id="pageTitle">Memory Game</p>
-    <div id="changeGridButton">Change Grid Size</div>
-    <div id="changeDeckButton">Change Deck Background</div>
-    <div id="timerDisplay">Timer</div>
-    <div id="attemptsDisplay">Attempts</div>
-    <div id="foundDisplay">Found</div>
-    <div id="changeLevel">Player Level</div>
-  </div>
+<div id="container">
+	<div id="title">
+	</div>
 
-<div id="game"></div>
+
+	<div class="title" style="height:60px;">
+		<p id="pageTitle">Memory Game</p>
+	</div>
+
+	<div id="changeLevel">Player Level</div>
+	<div id="changeGridButton">Change Grid Size</div>
+	<div id="changeDeckButton">Change Deck Background</div>
+
+	<div class="hud">
+		<div class="ftaDisplay" id="foundDiv">Found
+			<div class="ftaDisplay" id="cardFoundDisplay">#</div>
+		</div>
+		
+		<div class="ftaDisplay" id="timerDiv">
+			<div class="ftaDisplay timer" id="timerDisplay">00 : 00 : 00</div>
+		</div>
+
+		<div class="ftaDisplay" id="attemptsDiv">Attempts
+			<div class="ftaDisplay" id="attemptsDisplay">#</div>
+		</div>
+    </div>
+
+</div>
+
+<div class="flex-center">	
+	<div id="midsectionleft" class="scoreboard">
+	</div>
+	<div id="game"></div>
+	<div id="midsectionright" class="scoreboard">
+	</div>
+</div>
+
+
+
   
 </body>
 

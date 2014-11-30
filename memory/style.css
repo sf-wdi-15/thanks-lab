@@ -10,14 +10,45 @@ body p {
 
 gameGrid {
   margin: 0 auto;
-  position: relative;
-  top: 150px;
+  float:left;
 }
 
+.lowerSection {
+  width = 800px;
+}
 .flex-center {
   display: flex;
   justify-content: center;
 }
+
+.grid {
+  display: flex;
+  justify-content: center;
+}
+.hud {
+  display: flex;
+  justify-content: center;
+}
+
+.timer{
+  float: left;
+}
+
+.ftaDisplay{
+  min-width: 150px;
+  min-height: 100px;
+  background-size: 100% 100%;
+  border: 3px solid black;
+  margin: 3px;
+}
+
+.scoreboard{
+  width:200px;
+  height:350px;
+  float:left;
+  background-color: black;
+}
+
 
 .tile {
   min-width: 50px;

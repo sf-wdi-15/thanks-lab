@@ -28,20 +28,16 @@ Plan To:
   -Change back background color to black
   -Turn "grid" into an object that will generate a grid if you pass in a few values
   -Change all game variables into an object
+  -Add timer and grid to a library for reuse
+  -Make timer display generic to count any interval and reset 
+
 
 ******************************************************************************/
 
 
-
-// Need to find a way to getLength(image/frontAndBack_directory)
-var numberOfFrontImages = 20;
-var numberOfBackImages = 6; 
-
 window.onload = function()
 {
   // Sandbox area to try out random code 
-
-
   var temp = document.getElementById('changeGridButton');
   temp.onclick = changeGrid;
 
@@ -58,41 +54,57 @@ window.onload = function()
     deckFrontImages.push("url('./images/card_front/front_"+ temp + ".png')");
   }
   
-  
   temp = numberOfBackImages; // # of files in the card_back directory
   while (temp--)
   {
     deckBackImages.push("url('./images/card_back/back_"+ temp + ".png')");
   }
 
+  timerDisplay = document.getElementById('timerDisplay');
+  cardFoundDisplay = document.getElementById('cardFoundDisplay');
+  attemptsDisplay = document.getElementById('attemptsDisplay');
+
   generateGrid();
 
 }
 
-
-function Card(arrIndex,cardIndex)
+function Card(arrIndex,cardIndex, notFound)
 {
   this.index = arrIndex;
   this.imgIndex = cardIndex;
-  this.isFound = false;
+  this.notFound = notFound;
 }
 
 var gridSizes = 
         [
           [4,6],
-          [6,6]
+          [6,6],
+          [8,6],
+          [10,6]
         ];
 var deckFrontImages = [];
 var deckBackImages = [];
 var cardList = [];
 var card1ImageIndex = [{},{}];
-
-
+// Need to find a way to getLength(image/frontAndBack_directory)
+var numberOfFrontImages = 50;
+var numberOfBackImages = 6; 
 var currentDeckBackground = 0;
 var currentGridSize = 0;
 var currentCardImage = {};
 var currentCardIndex = {};
 var currentLevel = 1000;
+var cardFoundCount = 0;
+var attemptsCount = 0;
+
+var canClick = true;
+
+var startTime = 0;
+var secondCount = 0;
+var minuteCount = 0;
+var hourCount = 0;
+var intervalID;
+var startTime = 0;
 /******************************************************************************
   handleInput 
     
@@ -100,57 +112,123 @@ var currentLevel = 1000;
 ******************************************************************************/
 
 
-/* Player Experience
+/******************************************************************************
+  updateTimer
+    1. gets the seconds since the timer was started
+    2. resets seconds and minutes if it exceeds 60
+    3. updates seconds, minutes, and hours displays
+******************************************************************************/
 
-1. Click one card
-2. It shows the front
-3. Click the 2nd card
-4. It shows the front
-5. Check if these 2 cards are the same
-  5a. If they are the same
-      a1. leave the background image as is
-      a2. mark both isFound = true;
-  5b. If they are different
-      b1. change the background to the deck
-      
-*/
-var timeoutID;
-var canClick = true;
+var updateTimer = function()
+{
+
+  secondCount = Math.floor( (new Date() - startTime) / 1000);
+
+  if (secondCount > 60)
+  {
+    startTime = new Date();
+    secondCount = 0;
+    minuteCount += 1;
+  }
+
+  if (minuteCount > 60)
+  {
+    minuteCount = 0;
+    hourCount += 1;
+  }
+
+  if (secondCount < 10)
+  {
+    if (secondCount[0] !== 0)
+    {
+       secondCount = "0" + secondCount.toString();      
+    }
+  }
+ 
+  if (minuteCount < 10 && minuteCount !== "00")
+  {
+     minuteCount = "0" + minuteCount.toString();      
+  }
+  else
+  {
+    minuteCount = "00";
+  }
+
+  if (hourCount < 10 && hourCount !== "00")
+  {
+    if (hourCount[0] !== 0)
+    {
+       hourCount = "0" + hourCount.toString();      
+    }
+  }
+  else
+  {
+    hourCount = "00";
+  }
+
+  timerDisplay.innerHTML = hourCount + " : " + 
+                      minuteCount + " : " + 
+                      secondCount;
+};
+
 var handleInput = function()
 {
+  if (intervalID === undefined)
+  {
+    intervalID = window.setInterval(updateTimer,1000);
+    intervalId = "";
+    startTime = new Date();
+  }
+
   if (canClick)
   {
-    this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
-
-    if (isNaN(currentCardImage))
+    if (cardList[this.id].notFound)
     {
-      currentCardImage = cardList[this.id].imgIndex;
-      currentCardIndex = this.id;
-    }
+      this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
 
-    else
-    {
-      if (currentCardImage === cardList[this.id].imgIndex)
+      if (isNaN(currentCardImage))
       {
-        cardList[currentCardIndex].isFound = true;
-        cardList[this.id].isFound = true;
+        currentCardImage = cardList[this.id].imgIndex;
+        currentCardIndex = this.id;
       }
 
       else
       {
-        canClick = false;
-        timeoutID = window.setTimeout(updateGrid, currentLevel);
+        if (currentCardImage === cardList[this.id].imgIndex)
+        {
+          cardList[currentCardIndex].notFound = false;
+          cardList[this.id].notFound = false;
+          cardFoundCount += 1;
+
+        }
+
+        else
+        {
+          canClick = false;
+          var timeoutID = window.setTimeout(updateGrid, currentLevel);
+        }
+
+        currentCardImage= {};
+        attemptsCount+=1 ;
       }
 
-      currentCardImage= {};
     }
   }
+
+  // If all cards are found
+  if (cardFoundCount === numOfCardsNeeded )
+  {
+
+  }
+
+  cardFoundDisplay.innerHTML = cardFoundCount;  
+  attemptsDisplay.innerHTML = attemptsCount;
 };
 
 /******************************************************************************
   updateGrid
     1. iterates through the cardList
-    2. updates div background image according to whether it isFound
+    2. updates div background image according to whether it notFound
 ******************************************************************************/
 
 var updateGrid = function()
@@ -160,28 +238,30 @@ var updateGrid = function()
   {
     var c = document.getElementById(cardList[i].index);
 
-    if (cardList[i].isFound)
+    if (cardList[i].notFound)
     {
-      c.style.backgroundImage = deckFrontImages[cardList[i].imgIndex]; 
+       c.style.backgroundImage = deckBackImages[currentDeckBackground];
     }
     else
     {
-      c.style.backgroundImage = deckBackImages[currentDeckBackground];
+      c.style.backgroundImage = deckFrontImages[cardList[i].imgIndex]; 
+     
     }
   }
 
-  timeoutID = window.setTimeout(function() { canClick = true;}, 50)
-};
+  timeoutID = window.setTimeout(function() { canClick = true;}, 50);
 
+};
+var numOfCardsNeeded ;
 
 /******************************************************************************
   generateGrid 
     1. calculates how many unique cards are needed
-    1. sets up "for" loop based on grid dimensions
-    2. creates divs
-    3. instantiates new Cards
-    4. pushes new Card to the cardList
-    5. appends new div into the HTML page
+    2. sets up "for" loop based on grid dimensions
+    3. creates divs
+    4. instantiates new Cards
+    5. pushes new Card to the cardList
+    6. appends new div into the HTML page
 ******************************************************************************/
 
 
@@ -193,14 +273,14 @@ var generateGrid = function()
 
   node.innerHTML = "";
  
-  var numOfCardsNeeded = ( (gridSizes[currentGridSize][0] * 
+  numOfCardsNeeded = ( (gridSizes[currentGridSize][0] * 
                             gridSizes[currentGridSize][1]) / 2 );
   
   var cardIndex = 0;
 
   var newDiv = document.createElement("gameGrid");
   newDiv.id = "grid";
-  newDiv.className = "flex-center";
+  newDiv.className = "grid";
   document.getElementById('game').appendChild(newDiv);
 
   for (var col = 0; col < gridSizes[currentGridSize][0]; col += 1)
@@ -225,7 +305,7 @@ var generateGrid = function()
         //newDiv.width = tile dimension
         //newDiv.height = newDiv.width;
 
-        var tempCard = new Card(newDiv.id, cardIndex);
+        var tempCard = new Card(newDiv.id, cardIndex,true);
         cardList.push(tempCard);
 
         document.getElementById("row_"+col).appendChild(newDiv);
@@ -263,7 +343,7 @@ var changeLevel = function()
     1. increments currentDeckBackground counter by one
     2. resets currentDeckBackground counter to 0 if it is >= deckBackImages.length
     3. iterates through cardList 
-    4. changes background image where Card.isFound is false
+    4. changes background image where Card.notFound is false
 ******************************************************************************/
 var changeDeck = function()
 {
