@@ -1,8 +1,6 @@
-//Add support for udpating code based on window width
-
 /******************************************************************************
 
-Working: 
+Done: 
   -Have a grid generating function
   -Creates a card list and initializes pic index and array index (for card Id)
   -Have a prototype set up for cards to handle input when clicked
@@ -16,99 +14,21 @@ Working:
   -Fixed bug where the images would only show if a pair was found
   -Timer that displays seconds, minutes, hours
   -Player object that will keep track of found and attempts
+  -Message Bar that will give player's game status and icon details
+  -Settings icons that react to onmouseenter and onmouseout
+  -Fixed bug where the timer would not reset when grid/player change was clicked
+  -Fixed bug where change number of players stopped at 2 and could not switch back
 
 Plan To:
-  -Set up logic to check for matching conditions based on the card index
-  -Set up code that will show/hide or replace background image
-  -Look up animation and timer events
   -Shuffle function
-  -Set up a button that will reset the grid
   -set up function to update Card css dimensions based on grid size
-  -Add code to keep track of attempts
-  -Add code to keep track of start and finish time
-  -Add code to track how many found
-  -Change back background color to black
   -Turn "grid" into an object that will generate a grid if you pass in a few values
-  -Change all game variables into an object
   -Add timer and grid to a library for reuse
   -Make timer display generic to count any interval and reset 
+  -look at code in minutes/hours after it gets added
 
 
 ******************************************************************************/
-
-
-window.onload = function()
-{
-  // Sandbox area to try out random code 
-  var temp = document.getElementById('changeGridButton');
-  temp.onclick = changeGrid;
-  temp.onmouseenter = updateStatus;
-
-  
-  temp = document.getElementById('changeDeckButton');
-  temp.onclick = changeDeck;
-  temp.onmouseenter = updateStatus;
-
-  temp = document.getElementById('changeSpeed');
-  temp.onclick = changeSpeed;
-  temp.onmouseenter = updateStatus;
-  temp.innerHTML = currentLevel / 1000 + "s";
-
-  temp = document.getElementById('changePlayerNumber');
-  temp.onclick = changePlayerNumber;
-  temp.onmouseenter = updateStatus;
-
-
-
-  temp = numberOfFrontImages; // # of files in card_front directory
-
-  while (temp--)
-  {
-    deckFrontImages.push("url('./images/card_front/front_"+ temp + ".png')");
-  }
-  
-  temp = numberOfBackImages; // # of files in the card_back directory
-  
-  while (temp--)
-  {
-    deckBackImages.push("url('./images/card_back/back_"+ temp + ".png')");
-  }
-
-  document.getElementById('changeDeckButton').style.backgroundImage = deckBackImages[currentDeckBackground];
-  
-  timerDisplay = document.getElementById('timerDisplay');
-  player1Display = document.getElementById('player1Display');
-  player2Display = document.getElementById('player2Display');
-
-  messageBar = document.getElementById('messageBar');
-  
-  generateGrid();
-
-}
-
-var updateStatus = function()
-{
-  switch(this.id)
-  {
-    case "changeSpeed":
-      messageBar.innerHTML = "Change the card flipping speed.";
-    break;
-
-    case "changeDeckButton":
-      messageBar.innerHTML = "Change deck backgrounds.";
-    break;
-
-    case "changeGridButton":
-      messageBar.innerHTML = "Change the grid dimensions.";
-    break;
-
-    case "changePlayerNumber":
-      messageBar.innerHTML = "Change number of players.";
-    break;
-  }
-
-};
-
 function Card(arrIndex,cardIndex, notFound)
 {
   this.index = arrIndex;
@@ -132,19 +52,21 @@ var gridSizes =
           [10,6]
         ];
 var deckFrontImages = [];
-var deckBackImages = [];
+var deckColors = [
+"grey","orange","yellow","white"
+];
 var cardList = [];
 var card1ImageIndex = [{},{}];
 // Need to find a way to getLength(image/frontAndBack_directory)
 var numberOfFrontImages = 50;
 var numberOfBackImages = 6; 
-var currentDeckBackground = 0;
+var currentDeckColor = 0;
 var currentGridSize = 0;
 var currentCardImage = {};
-var currentCardIndex = {};
-var currentLevel = 1000;
+var currentCardIndex = "";
+var currentSpeed = 500;
 var cardFoundCount = 0;
-var attemptsCount = 0;
+var attemptsCount = 1;
 
 var canClick = true;
 
@@ -153,21 +75,204 @@ var secondCount = 0;
 var minuteCount = 0;
 var hourCount = 0;
 var intervalID;
-var startTime = 0;
 
 var player1 = new Player(0,0);
 var player2 = new Player(0,0);
 
-var playerNumber = 1;
+var numberOfPlayers = 1;
 
+var currentMessage = "Click on any tile to start a game.";
+
+var numOfCardsNeeded ;
+var isPlayer1 = true;
+var gameOn = false;
+
+var player1Color = "rgba(0,255,0,.6)";
+var player2Color = "rgba(255,0,0,.6)";
+var singlePlayerColor = "rgba(0,130,255,.5)";
+
+
+window.onload = function()
+{
+  // Sandbox area to try out random code 
+  var temp = document.getElementById('changeGridButton');
+  temp.onclick = changeGrid;
+  temp.onmouseover = updateStatus;
+  temp.onmouseout = outStatus;
+
+  
+  temp = document.getElementById('changeDeckButton');
+  temp.onclick = changeDeck;
+  temp.onmouseover = updateStatus;
+  temp.onmouseout = outStatus;
+
+  temp = document.getElementById('changeSpeed');
+  temp.onclick = changeSpeed;
+  temp.onmouseover = updateStatus;
+  temp.onmouseout = outStatus;
+  temp.innerHTML = currentSpeed / 1000 + "s";
+
+  temp = document.getElementById('changeNumberOfPlayers');
+  temp.style.backgroundImage = "url('./images/settings/player1.png')";
+  temp.style.backgroundColor = singlePlayerColor;
+  temp.onclick = changeNumberOfPlayers;
+  temp.onmouseout = outStatus;
+  temp.onmouseover = updateStatus;
+
+  temp = numberOfFrontImages; // # of files in card_front directory
+
+  while (temp--)
+  {
+    deckFrontImages.push("url('./images/card_front/front_"+ temp + ".png')");
+  }
+  
+  temp = numberOfBackImages; // # of files in the card_back directory
+  
+  document.getElementById('changeDeckButton').style.backgroundColor = deckColors[currentDeckColor];
+  document.getElementById('changeDeckButton').style.backgroundImage = "url('./images/settings/deck.png')";
+  
+
+  timerDisplay = document.getElementById('timerDisplay');
+  player1Display = document.getElementById('player1Display');
+  player2Display = document.getElementById('player2Display');
+
+  messageBar = document.getElementById('messageBar');
+  messageBar.innerHTML = currentMessage;
+
+  document
+
+  generateGrid();
+
+}
+
+var updateStatus = function()
+{
+  switch(this.id)
+  {
+    case "changeSpeed":
+      messageBar.innerHTML = "Change the card flipping speed.";
+    break;
+
+    case "changeDeckButton":
+      messageBar.innerHTML = "Change deck backgrounds.";
+    break;
+
+    case "changeGridButton":
+      messageBar.innerHTML = "Change the grid dimensions.";
+    break;
+
+    case "changeNumberOfPlayers":
+      messageBar.innerHTML = "Change number of players.";
+    break;
+  }
+
+};
+
+var outStatus = function()
+{
+  messageBar.innerHTML = currentMessage;
+};
 
 
 /******************************************************************************
-  handleInput 
-    
+  resetValues 
+******************************************************************************/
+var resetValues = function()
+{
+  cardList = [];
+  attemptsCount = 1;
+  cardFoundCount = 0;
+  secondCount = "00";
+  minuteCount = "00";
+  hourCount = "00";
+  clearInterval(intervalID);
+  intervalID = undefined;
+  gameOn = false;
+  updateTimerDisplay();
+  isPlayer1 = 1;
 
+  currentCardImage = {};
+  currentCardIndex = "";
+  cardFoundCount = 0;
+
+  canClick = true;
+
+  startTime = 0;
+  secondCount = 0;
+  minuteCount = 0;
+  hourCount = 0;
+  intervalID;
+
+  player1 = new Player(0,0);
+  player2 = new Player(0,0);
+
+  isPlayer1 = true;
+  gameOn = false;
+
+  currentMessage = "Click on any tile to start a game.";
+
+
+};
+
+/******************************************************************************
+  generateGrid 
+    1. calculates how many unique cards are needed
+    2. sets up "for" loop based on grid dimensions
+    3. creates divs
+    4. instantiates new Cards
+    5. pushes new Card to the cardList
+    6. appends new div into the HTML page
 ******************************************************************************/
 
+
+var generateGrid = function()
+{
+  resetValues();
+
+  var node = document.getElementById('game');
+
+  node.innerHTML = "";
+ 
+  numOfCardsNeeded = ( (gridSizes[currentGridSize][0] * 
+                            gridSizes[currentGridSize][1]) / 2 );
+  
+  var cardIndex = 0;
+
+  var newDiv = document.createElement("div");
+  newDiv.id = "grid";
+  newDiv.className = "grid";
+  document.getElementById('game').appendChild(newDiv);
+
+  for (var col = 0; col < gridSizes[currentGridSize][0]; col += 1)
+  {
+    newDiv = document.createElement("div");
+    newDiv.id = "row_"+col;
+    newDiv.className = "row";
+    document.getElementById('grid').appendChild(newDiv);
+
+    for (var row = 0; row < gridSizes[currentGridSize][1]; 
+                                      row += 2, cardIndex += 1)
+    { 
+      for (var i = 0; i < 2; i +=1)
+      {
+        newDiv = document.createElement("div"); 
+
+        newDiv.className = "tile";
+        newDiv.style.backgroundColor = deckColors[currentDeckColor];
+        newDiv.onclick = handleInput;
+        newDiv.id = cardList.length;
+        //newDiv.width = tile dimension
+        //newDiv.height = newDiv.width;
+
+        var tempCard = new Card(newDiv.id, cardIndex,true);
+        cardList.push(tempCard);
+
+        document.getElementById("row_"+col).appendChild(newDiv);
+
+      }
+    }
+  } 
+};
 
 /******************************************************************************
   updateTimer
@@ -178,11 +283,9 @@ var playerNumber = 1;
 
 var updateTimer = function()
 {
-
-// NEED TO FIX TIMER BUG
   secondCount = Math.floor( (new Date() - startTime) / 1000);
 
-  if (secondCount > 60)
+  if (secondCount >= 60)
   {
     startTime = new Date();
     secondCount = 0;
@@ -224,121 +327,166 @@ var updateTimer = function()
     hourCount = "00";
   }
 
+  updateTimerDisplay();
+};
+
+/******************************************************************************
+  updateTimerDisplay 
+    
+
+******************************************************************************/
+
+var updateTimerDisplay = function()
+{
   timerDisplay.innerHTML = hourCount + " : " + 
                       minuteCount + " : " + 
                       secondCount;
 };
 
+/******************************************************************************
+  handleInput 
+    
 
-var isPlayer1 = true;
+******************************************************************************/
 
 var handleInput = function()
 {
+  gameOn = true;
 
-  if (isPlayer1)
+  if (gameOn)
   {
     if (intervalID === undefined)
     {
-      intervalID = window.setInterval(updateTimer,1000);
-      intervalId = "";
+      intervalID = window.setInterval(updateTimer,500);
       startTime = new Date();
+      gameOn = true;
     }
 
-    if (canClick)
+    if (numberOfPlayers === 1)
     {
-      if (cardList[this.id].notFound)
+       updatePlayer(player1, this, "rgba(0,130,255,.5)");
+    }
+
+    else
+    {
+      if (isPlayer1)
       {
-        this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
-
-        if (isNaN(currentCardImage))
-        {
-          currentCardImage = cardList[this.id].imgIndex;
-          currentCardIndex = this.id;
-        }
-
-        else
-        {
-          if (currentCardImage === cardList[this.id].imgIndex)
-          {
-            cardList[currentCardIndex].notFound = false;
-            cardList[this.id].notFound = false;
-            player1.cardFoundCount += 1;
-
-          }
-
-          else
-          {
-            canClick = false;
-            var timeoutID = window.setTimeout(updateGrid, currentLevel);
-
-            isPlayer1 = false;
-          }
-
-          currentCardImage= {};
-          player1.attemptsCount+=1 ;
-        }
+        updatePlayer(player1, this, "rgba(0,255,0,.5)");
       }
-    }
-  }
 
-  else
-  {
-    if (intervalID === undefined)
-    {
-      intervalID = window.setInterval(updateTimer,1000);
-      intervalId = "";
-      startTime = new Date();
-    }
-
-    if (canClick)
-    {
-      if (cardList[this.id].notFound)
+      else
       {
-        this.style.backgroundImage = deckFrontImages[cardList[this.id].imgIndex];
-
-        if (isNaN(currentCardImage))
-        {
-          currentCardImage = cardList[this.id].imgIndex;
-          currentCardIndex = this.id;
-        }
-
-        else
-        {
-          if (currentCardImage === cardList[this.id].imgIndex)
-          {
-            cardList[currentCardIndex].notFound = false;
-            cardList[this.id].notFound = false;
-            player2.cardFoundCount += 1;
-
-          }
-
-          else
-          {
-            canClick = false;
-            var timeoutID = window.setTimeout(updateGrid, currentLevel);
-            isPlayer1 = true;
-
-          }
-
-          currentCardImage= {};
-          player2.attemptsCount+=1 ;
-        }
+        updatePlayer(player2, this, "rgba(255,0,0,.5)");
       }
+
     }
+
+    // If all cards are found
+    if (cardFoundCount === numOfCardsNeeded )
+    {
+
+    }
+
   }
-
-
-  // If all cards are found
-  if (cardFoundCount === numOfCardsNeeded )
-  {
-
-  }
-
-  player1Display.innerHTML = player1.cardFoundCount + " : " + player1.attemptsCount;
-  player2Display.innerHTML = player2.cardFoundCount + " : " + player2.attemptsCount;
+  
+  messageBar.innerHTML = currentMessage;
 };
 
+/******************************************************************************
+  updatePlayer 
+    
 
+******************************************************************************/
+
+var updatePlayer = function(player, element, color)
+{
+  if (canClick)
+  {
+    element.style.backgroundColor = document.getElementById('changeNumberOfPlayers').style.backgroundColor;
+    if (cardList[element.id].notFound)
+    {
+      element.style.backgroundImage = deckFrontImages[cardList[element.id].imgIndex];
+
+      if (isNaN(currentCardImage))
+      {
+        currentCardImage = cardList[element.id].imgIndex;
+        currentCardIndex = element.id;
+      }
+
+      else
+      {
+        if (currentCardIndex !== cardList[element.id].index)
+        {
+          if (currentCardImage === cardList[element.id].imgIndex)
+          {
+            cardList[currentCardIndex].notFound = false;
+            cardList[element.id].notFound = false;
+            player.cardFoundCount += 1;
+
+            if (numberOfPlayers == 1)
+            {
+                document.getElementById(element.id).style.backgroundColor = singlePlayerColor;
+                document.getElementById(currentCardIndex).style.backgroundColor = singlePlayerColor;
+                document.getElementById('changeNumberOfPlayers').style.backgroundColor = singlePlayerColor;
+            }
+            else
+            {
+              if (isPlayer1)
+              {
+                document.getElementById(element.id).style.backgroundColor = color;
+                document.getElementById(currentCardIndex).style.backgroundColor = color;
+
+              }
+
+              else
+              {
+                document.getElementById(element.id).style.backgroundColor = color;
+                document.getElementById(currentCardIndex).style.backgroundColor = color;
+
+              }
+
+            }
+
+          }
+
+          else
+          {
+
+            isPlayer1 = !isPlayer1;
+          }
+
+         
+
+          canClick = false;
+          var timeoutID = window.setTimeout(updateGrid, currentSpeed);
+          currentCardImage= {};
+          currentCardIndex = "";
+        }
+         if (numberOfPlayers == 1)
+          {
+              currentMessage = "Attempts: " + attemptsCount;
+              attemptsCount += 1;
+
+          }
+          else
+          {
+            if (isPlayer1)
+            {
+              player1.attemptsCount +=1;
+              currentMessage = "Attempts: " + player1.attemptsCount;
+
+            }
+
+            else
+            {
+              player2.attemptsCount += 1;
+              currentMessage = "Attempts: " + player2.attemptsCount;
+            }
+          }
+      }
+    }
+  }
+};
 
 /******************************************************************************
   updateGrid
@@ -348,129 +496,89 @@ var handleInput = function()
 
 var updateGrid = function()
 {
-  
+
   for (var i = 0, j = cardList.length; i < j; i +=1)
   {
     var c = document.getElementById(cardList[i].index);
 
     if (cardList[i].notFound)
     {
-       c.style.backgroundImage = deckBackImages[currentDeckBackground];
+       c.style.backgroundColor = deckColors[currentDeckColor];
+       c.style.backgroundImage = "url('./images/settings/deck.png')";
     }
     else
     {
       c.style.backgroundImage = deckFrontImages[cardList[i].imgIndex]; 
-     
     }
   }
 
-  timeoutID = window.setTimeout(function() { canClick = true;}, 50);
-
-};
-var numOfCardsNeeded ;
-
-/******************************************************************************
-  generateGrid 
-    1. calculates how many unique cards are needed
-    2. sets up "for" loop based on grid dimensions
-    3. creates divs
-    4. instantiates new Cards
-    5. pushes new Card to the cardList
-    6. appends new div into the HTML page
-******************************************************************************/
-
-
-var generateGrid = function()
-{
-  // Reset game stats
-  cardList = [];
-  var node = document.getElementById('game');
-
-  node.innerHTML = "";
- 
-  numOfCardsNeeded = ( (gridSizes[currentGridSize][0] * 
-                            gridSizes[currentGridSize][1]) / 2 );
-  
-  var cardIndex = 0;
-
-  var newDiv = document.createElement("div");
-  newDiv.id = "grid";
-  newDiv.className = "grid";
-  document.getElementById('game').appendChild(newDiv);
-
-  for (var col = 0; col < gridSizes[currentGridSize][0]; col += 1)
-  {
-    newDiv = document.createElement("div");
-    newDiv.id = "row_"+col;
-    newDiv.className = "row";
-    document.getElementById('grid').appendChild(newDiv);
-
-    for (var row = 0; row < gridSizes[currentGridSize][1]; 
-                                      row += 2, cardIndex += 1)
+  timeoutID = window.setTimeout(function() 
     { 
-      for (var i = 0; i < 2; i +=1)
+      canClick = true;
+
+      if (intervalID !== undefined)
       {
-        newDiv = document.createElement("div"); 
-
-        newDiv.className = "tile";
-        newDiv.style.backgroundImage = deckBackImages[currentDeckBackground];
-        newDiv.onclick = handleInput;
-        newDiv.id = cardList.length;
-        //newDiv.width = tile dimension
-        //newDiv.height = newDiv.width;
-
-        var tempCard = new Card(newDiv.id, cardIndex,true);
-        cardList.push(tempCard);
-
-        document.getElementById("row_"+col).appendChild(newDiv);
-
+        if (numberOfPlayers !== 1)
+        {
+          if (isPlayer1)
+          { 
+            document.getElementById('changeNumberOfPlayers').style.backgroundColor = player1Color;
+          }
+          else
+          {
+            document.getElementById('changeNumberOfPlayers').style.backgroundColor = player2Color;
+          }
+        }
+        else
+        {
+            document.getElementById('changeNumberOfPlayers').style.backgroundColor = singlePlayerColor;
+        }
       }
-    }
-  } 
-
+    }, 0);
 
 };
 
 /******************************************************************************
   changeSpeed
-    1. increments currentLevel by 1000
-    -currentLevel is used in handleInput() as the time interval (1000 = 1 sec)
-    2. resets to 1 second if currentLevel exceeds 5000 ms (5 seconds)
+    1. increments currentSpeed by 1000
+    -currentSpeed is used in handleInput() as the time interval (1000 = 1 sec)
+    2. resets to 1 second if currentSpeed exceeds 5000 ms (5 seconds)
 ******************************************************************************/
 var changeSpeed = function()
 {
   // add another second to the clock
-  currentLevel += 1000;
+  currentSpeed += 500;
 
   // if current level is set to 5 seconds, reset 
-  if (currentLevel > 5000)
+  if (currentSpeed > 2000)
   {
     // reset to 1 second 
-    currentLevel = 1000;
+    currentSpeed = 500;
   }
 
-  document.getElementById('changeSpeed').innerHTML = currentLevel / 1000 + "s";
+  document.getElementById('changeSpeed').innerHTML = currentSpeed / 1000 + "s";
 };
 
 
 
 /******************************************************************************
   changeDeck
-    1. increments currentDeckBackground counter by one
-    2. resets currentDeckBackground counter to 0 if it is >= deckBackImages.length
+    1. increments currentDeckColor counter by one
+    2. resets currentDeckColor counter to 0 if it is >= deckColors.length
     3. iterates through cardList 
     4. changes background image where Card.notFound is false
 ******************************************************************************/
 var changeDeck = function()
 {
-  currentDeckBackground += 1;
+  currentDeckColor += 1;
 
-  if (currentDeckBackground >= deckBackImages.length)
+  if (currentDeckColor >= deckColors.length)
   {
-    currentDeckBackground = 0;
+    currentDeckColor = 0;
   }
 
-  document.getElementById('changeDeckButton').style.backgroundImage = deckBackImages[currentDeckBackground];
+  document.getElementById('changeDeckButton').style.backgroundColor = deckColors[currentDeckColor];
+  document.getElementById('changeDeckButton').style.backgroundImage = "url('./images/settings/deck.png')";
 
   updateGrid();
 };
@@ -494,21 +602,32 @@ var changeGrid = function()
 };
 
 /******************************************************************************
-  changePlayerNumber
+  changenumberOfPlayers
 ******************************************************************************/
-var changePlayerNumber = function()
+var changeNumberOfPlayers = function()
 {
-  if (playerNumber === 1)
+  if (numberOfPlayers == 1)
   {
-    playerNumber = 2;
-    document.getElementById('changePlayerNumber').style.backgroundImage = "url('./images/settings/player2.png')";
-
+    document.getElementById('changeNumberOfPlayers').style.backgroundImage = "url('./images/settings/player2.png')";
+    document.getElementById('changeNumberOfPlayers').style.backgroundColor = player1Color;
   }
   else
   {
-    playerNumber = 1;
-    document.getElementById('changePlayerNumber').style.backgroundImage = "url('./images/settings/player1.png')";
+    document.getElementById('changeNumberOfPlayers').style.backgroundImage = "url('./images/settings/player1.png')";
+    document.getElementById('changeNumberOfPlayers').style.backgroundColor = singlePlayerColor;    
   }
 
   generateGrid();
+
+  if (numberOfPlayers == 1)
+  {
+    numberOfPlayers = 2;
+  }
+  else
+  {
+    numberOfPlayers = 1;
+  }  
 };
+
+
+
