@@ -1,0 +1,36 @@
+div#memory_board{
+    color: white;
+    /*background:darkslategrey;*/
+    background:slategrey;
+    border: orangered 10px solid;
+    width:100%;
+    height:40em;
+    padding: 5%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    /*padding:24px;*/
+    /*margin:0px auto;*/
+}
+div#memory_board > div{
+    height: 20%;
+    width: 20%;
+    margin: 2.5%;
+    float: left;
+    font-size: 5em;
+    font-family: monospace;
+    text-align: center;
+    text-align-all: center;
+    border:orangered 3px solid;
+    background-color: darkslategrey;
+}
+#gameControlDisplay{
+    text-align: center;
+    /*margin-top: 5%;*/
+    /*margin: 0px auto;*/
+    /*padding-left: auto;*/
+    /*padding-right: auto;*/
+}
+.button{
+    background-color: orangered;
+    transition: background-color 300ms ease-out;
+}
