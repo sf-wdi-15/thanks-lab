@@ -1,0 +1,29 @@
+.board {
+  position: relative;
+  width:  500px;
+  height: 500px;
+}
+.row {
+  padding: 1px;
+  width: 100%; 
+  margin: 2px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.card {
+  height: 50px;
+  width: 50px;
+  background-color: red;
+  display: inline-block;
+  margin: 2px;
+  float: left;
+}
+
+.oops {
+  background-color: blue;
+}
