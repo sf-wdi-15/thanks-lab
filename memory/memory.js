@@ -1,5 +1,4 @@
 /******************************************************************************
-
 Done: 
   -Have a grid generating function
   -Creates a card list and initializes pic index and array index (for card Id)
@@ -18,7 +17,6 @@ Done:
   -Settings icons that react to onmouseenter and onmouseout
   -Fixed bug where the timer would not reset when grid/player change was clicked
   -Fixed bug where change number of players stopped at 2 and could not switch back
-
 Plan To:
   -Shuffle function
   -set up function to update Card css dimensions based on grid size
@@ -26,8 +24,6 @@ Plan To:
   -Add timer and grid to a library for reuse
   -Make timer display generic to count any interval and reset 
   -look at code in minutes/hours after it gets added
-
-
 ******************************************************************************/
 function Card(arrIndex,cardIndex, notFound)
 {
@@ -53,7 +49,8 @@ var gridSizes =
         ];
 var deckFrontImages = [];
 var deckColors = [
-"grey","orange","yellow","white"
+"darkGoldenRod","brown","lightSeaGreen",
+"steelblue", "oliveDrab", "mediumSlateBlue", "yellow"
 ];
 var cardList = [];
 var card1ImageIndex = [{},{}];
@@ -333,7 +330,6 @@ var updateTimer = function()
 /******************************************************************************
   updateTimerDisplay 
     
-
 ******************************************************************************/
 
 var updateTimerDisplay = function()
@@ -346,7 +342,6 @@ var updateTimerDisplay = function()
 /******************************************************************************
   handleInput 
     
-
 ******************************************************************************/
 
 var handleInput = function()
@@ -395,7 +390,6 @@ var handleInput = function()
 /******************************************************************************
   updatePlayer 
     
-
 ******************************************************************************/
 
 var updatePlayer = function(player, element, color)
@@ -628,6 +622,3 @@ var changeNumberOfPlayers = function()
     numberOfPlayers = 1;
   }  
 };
-
-
-
