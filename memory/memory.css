@@ -1,0 +1,26 @@
+html {
+	background:url(http://www.perfectdayshawaii.com/assets/MapofKauaiBeaches_HanaleiBay.jpg);
+	background: center;
+}
+
+#memory_board {
+  background:#CCC;
+  opacity:0.7;
+  border:#999 1px solid;
+  width:590px;
+  height:475px;
+  padding:24px;
+  margin:75px auto;
+}
+#memory_board > div{
+  background:#111;
+  border:#000 1px solid;
+  width:50px;
+  height:50px;
+  float:left;
+  margin:3px;
+  padding:30px;
+  font-size:64px;
+  cursor:pointer;
+  text-align:center;
+}
