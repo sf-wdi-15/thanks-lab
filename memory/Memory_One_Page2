@@ -4,7 +4,7 @@
 <style>
 
 	body {
-		background-color: pink;
+		background-color: orange;
 	}
 	#gameboard {
 	  height: 650px;
@@ -82,16 +82,17 @@
 	        this[i] = temp;
 	    }
 	};
+
 	function newBoard(){
 		tiles_flipped = 0;
 		var output = '';
-	    tiles.memory_tile_shuffle();
+	  tiles.memory_tile_shuffle();
 		for(var i = 0; i < tiles.length; i++){
 			output += '<div id="tile_'+i+'" onclick="memoryFlipTile(this,\''+tiles[i]+'\')"></div>';
 		}
 		document.getElementById('gameboard').innerHTML = output;
 	  console.log(output);
-	}
+	};
 
 	var start = document.getElementById("start");
 
@@ -100,7 +101,6 @@
 	  newBoard();
 	  alert("Starting New Game!");
 	  console.log("Start Click Working");
-
 	};
 	                
 
