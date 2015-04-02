@@ -38,7 +38,7 @@ function shuffle(array) {
 
 // Sets values array to determine winning squares
 valuesArray = shuffle(originalArray);
-console.log(valuesArray);
+//console.log(valuesArray);
 
 
 one.onclick = function(event) {
