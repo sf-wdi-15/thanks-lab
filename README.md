@@ -12,7 +12,7 @@ Scroll down for the actual assignment!
 
 ### Git
 - [Git practice](https://try.github.io/levels/1/challenges/1)
-- [Git tutorial videos](https://www.codeschool.com/courses/git-real)
+- [Git tutorial videos](https://www.codeschool.com/courses/git-real)`
 - [More Git practice](https://github.com/grayghostvisuals/Practice-Git)
 
 ### GitHub

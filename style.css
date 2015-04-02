@@ -1,0 +1,52 @@
+* {
+	font-size: 45px;
+}
+
+h1 {
+	text-align: center;
+	font-size: 30px;
+
+}
+.container {
+	width: 600px;
+	height: 600px;
+	margin: 2.5% auto 5% auto;
+	background: rgb(255, 255, 204);
+	border: .05em solid;
+    border-color: black;
+}
+
+.square {
+	width: 140px;
+	height: 140px;
+	margin: 5px;
+	background: rgb(204, 229, 255);
+	text-align: center;
+	color: black;
+	float: left;
+	line-height: 130px;
+}
+
+.innerSquare {
+	width: 170px;
+	height: 170px;
+	text-align: center;
+	line-height: 170px;
+	color: blue;
+	margin: 10px;
+	font-size: 75px;
+}
+
+.reset {
+	margin-top: 20px;
+	float: right;
+}
+.reset button{
+	font-size: 20px;
+	background-color: rgb(204, 229, 255);
+}
+.whoTurn {
+	padding-top: 100px; 
+	font-size: 20px;
+	font-family: sans-serif;
+}
